@@ -1,4 +1,4 @@
-89689b2347329d43d12f46e30f202eee *DESCRIPTION
+51a9a03dcdd8ec5620ecdaa2b15adfca *DESCRIPTION
 977bc758f2ecfdce847b2baade7b39d5 *NAMESPACE
 b05d8ea2afd8e18688cf19e0ecb32241 *R/fitS4.R
 baf70d9748202ed7af0ec609cb010e01 *R/funcsS4.R
@@ -10,7 +10,7 @@ b4de6e0a0b62069a6d25a89ebf17d501 *README.md
 3a30ceb0e4f4a5ef04d7584bde027c2d *data/ex.RData
 767d955eba02b04f105152065c3540a5 *inst/doc/example.R
 5c243996d8afa57e91c57d5033cf9179 *inst/doc/example.Rmd
-e230a4f529ba0999b9fd747f81c7d86b *inst/doc/example.html
+cba041236deceb92844bc82da6c9d999 *inst/doc/example.html
 8a024c67bd0b86b84f727f4ecdb3f708 *man/cost.Rd
 d96530b1b52e4d50d80c6cc83b05175a *man/ex.Rd
 7d2f43a865a48b5ba440fa7da89aa0c3 *man/feat.Rd
@@ -35,8 +35,8 @@ b6f451b9976960baf8b0522eb09e9854 *man/oscar.pareto.Rd
 43c1110ef3b4411560d36ded084327bf *man/oscar.pareto.visu.Rd
 d17cb3b9be1dc0c30da9253581f87a9e *man/oscar.sparsify.Rd
 76d52c2d877f9d845bd990e0a7af9959 *man/oscar.visu.Rd
-c822246f2858be17a76f5035f801faff *src/Makevars
-abe57bb736a5f6670982667b44e48878 *src/dbdc.f90
+112de539a4a5be3d0a28dce79962ded6 *src/Makevars
+09bb27d85d21d1dbd419b87fd329891a *src/dbdc.f90
 0aa03b3fc6ada54df8875c6f306178d9 *src/oscarc.c
 2dd3befdaa057602c436a2bfdb1847eb *src/plqdf1.f
 5c243996d8afa57e91c57d5033cf9179 *vignettes/example.Rmd
