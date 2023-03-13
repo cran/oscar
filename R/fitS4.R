@@ -34,6 +34,8 @@ setClass("oscar", # abbreviation
 		kmax = "integer",	# Number of maximum k tested
 		metric = "character",	# Name of the goodness-of-fit metric used
 		solver = "character",  	# Name of the solver used in the optimization (DBDC = 1 or LMBM = 2)
+		in_selection = "integer", # Starting point selection method used in the optimization
+		percentage = "numeric", # Percentage of used starting points (and potential predictors per k with in_selection 3 and 4)
 		call = "call"		# Function call
 	),	
 	prototype(
@@ -58,6 +60,8 @@ setClass("oscar", # abbreviation
 		kmax = NA_integer_,
 		metric = NA_character_,
 		solver = NA_character_,
+		in_selection = NA_integer_,
+	 	percentage = NA_real_,
 		call = call("oscar")
 	),
 	# Function for testing whether all S4-slots are legitimate for the S4 object 
@@ -85,6 +89,10 @@ setClass("oscar", # abbreviation
 #' @param print Level of verbosity in Fortran (may not be visible on all terminals); should be an integer between {range, range}, Default: 3
 #' @param kmax Maximum k step tested, by default all k are tested from k to maximum dimensionality, Default: ncol(x)
 #' @param sanitize Whether input column names should be cleaned of potentially problematic symbols, Default: TRUE
+#' @param percentage Percentage of possible starting points used within range [0,1], Default: 1
+#' @param in_selection Which starting point selection strategy is used (1, 2 or 3), Default: 1
+#' @param storeX If data matrix X should be saved in the model object; turning this off might would help with memory, Default: TRUE 
+#' @param storeY If data response Y should be saved in the model object; turning this off might would help with memory, Default: TRUE 
 #' @param control Tuning parameters for the optimizers, see function oscar.control(), Default: see ?oscar.control
 #' @param ... Additional parameters
 #'
@@ -121,6 +129,12 @@ oscar <- function(
 	kmax,    # Maximum tested k-values
 	sanitize = TRUE,	# Whether column (i.e. variable) names are cleaned of potentially hazardous symbols
 	# Tuning parameter generation for the optimizers DBDC and LMBM; default values are generated with oscar.control-function, and can be replaced in the list
+	percentage = 1, # Percentage of possible starting points used (1=100%, 0.1=10% etc)
+	in_selection = 1, # Which starting point selection strategy is used (1, 2 or 3)
+	# Whether certain slots should be stored; saves space e.g. if large X matrices are not stored over multiple fit objects
+	storeX = TRUE,
+	storeY = TRUE,
+	# Control parameters
 	control,
 	# Additional parameters, passed on to oscar.control(...)
 	...
@@ -162,7 +176,17 @@ oscar <- function(
 	}else{
 		# TODO; User provided custom metrics; 
 		# check if legitimate (for logistic e.g. 'accuracy' and 'auc' ought to work)
-		stop("User provided custom goodness metrics not yet supported.")
+		stop(paste("User provided custom goodness metrics not yet supported:", metric))
+	}
+
+	# Checking for redundancy in data matrix (columns with singular value) or NAs
+	# Results in a stop
+	if(any(apply(x, MARGIN=2, FUN=\(q){ all(q==unique(q)[1]) }))){
+		stop("Matrix 'x' contains redundant data columns which contain only a singular value")
+	}else if(any(is.na(x))){
+		stop("Matrix 'x' contains NA-values")
+	}else if(any(is.na(y))){
+		stop("Response 'y' contains NA-values")
 	}
 
 	# Flip Cox event/time columns to correct column order
@@ -224,6 +248,12 @@ oscar <- function(
 		kmax <- as.integer(kmax)
 	}else if(!inherits(kmax, c("integer", "numeric"))){
 		stop("Provided kmax parameter ought to be of type 'integer' or 'numeric' cast to an integer")
+	}
+	# Check allowed kmax limits
+	if(kmax<=0){
+		kmax <- 1
+	}else if(kmax > nrow(k)){
+		kmax <- nrow(k)
 	}
 	# If kit weights are missing, assume them to be unit cost
 	if(missing(w)){
@@ -312,15 +342,14 @@ oscar <- function(
 			as.double(control$tolg), # Tolerance for the first termination criterion
 			as.double(control$tolg2), # Tolerance for the second termination criterion
 			as.double(control$eta), # Distance measure parameter
-			as.double(control$epsL) # Line search parameter
+			as.double(control$epsL), # Line search parameter
+			# Generic tuning parameters for starting point generation
+			as.double(percentage), # Percentage of starting points used
+			as.integer(in_selection) # Starting point selection method
 		)
 		if(verb>=2){
 			print(res)
 		}
-		# Beta per k steps
-		bperk <- matrix(res[[1]], nrow = ncol(x), ncol = nrow(k))
-		# Naming rows/cols/vector elements
-		rownames(bperk) <- colnames(x)
 	# Gaussian / normal distribution fit using mean-squared error	
 	}else if(family %in% c("mse", "gaussian")){
 		# Call C function for Mean-Squared Error regression
@@ -362,14 +391,12 @@ oscar <- function(
 			as.double(control$tolg), # Tolerance for the first termination criterion
 			as.double(control$tolg2), # Tolerance for the second termination criterion
 			as.double(control$eta), # Distance measure parameter
-			as.double(control$epsL) # Line search parameter
+			as.double(control$epsL), # Line search parameter
+			# Generic tuning parameters for starting point generation
+			as.double(percentage), # Percentage of starting points used
+			as.integer(in_selection) # Starting point selection method
 		)
-		# Beta per k steps
-		# Add row for intercept
-		bperk <- matrix(res[[1]], nrow = ncol(x)+1, ncol = nrow(k))
-		# Naming rows/cols/vector elements
-		rownames(bperk) <- c(colnames(x),"intercept")
-		
+	# Logistic regression		
 	}else if(family == "logistic"){
 		# Call C function for logistic regression
 		res <- .Call(c_oscar_logistic_f, 
@@ -410,14 +437,11 @@ oscar <- function(
 			as.double(control$tolg), # Tolerance for the first termination criterion
 			as.double(control$tolg2), # Tolerance for the second termination criterion
 			as.double(control$eta), # Distance measure parameter
-			as.double(control$epsL) # Line search parameter
+			as.double(control$epsL), # Line search parameter
+			# Generic tuning parameters for starting point generation
+			as.double(percentage), # Percentage of starting points used
+			as.integer(in_selection) # Starting point selection method
 		)
-		# Beta per k steps
-		# Add row for intercept
-		bperk <- matrix(res[[1]], nrow = ncol(x)+1, ncol = nrow(k))
-		# Naming rows/cols/vector elements
-		rownames(bperk) <- c(colnames(x),"intercept")
-	
 	}
 
 	# If verb is high enough, print midpoints
@@ -432,7 +456,7 @@ oscar <- function(
 	# Beta per k steps
 	# Cox regression doesn't have intercept
 	if(family == "cox"){
-		bperk <- matrix(res[[1]], nrow = ncol(x), ncol = nrow(k))
+		bperk <- matrix(res[[1]], nrow = ncol(x), ncol = kmax)
 		rownames(bperk) <- colnames(x)
 	# All other model families have intercept
 	}else{
@@ -445,7 +469,7 @@ oscar <- function(
 	# Target function values per k steps
 	fperk <- as.numeric(res[[2]])
 	# Naming rows/cols/vector elements
-	names(fperk) <- colnames(bperk) <- paste("k_", 1:nrow(k), sep="")
+	names(fperk) <- colnames(bperk) <- paste("k_", 1:kmax, sep="")
 	
 	if(verb>=2){
 		print("fperk")
@@ -460,18 +484,18 @@ oscar <- function(
 		print(bperk)
 	}
 	## Get kperk from Fortran
-	kperk <- t(matrix(res[[3]], nrow = nrow(k), ncol = nrow(k)))
+	kperk <- t(matrix(res[[3]], nrow = nrow(k), ncol = kmax))
 	if(verb>=3){
 		print("kperk1")
 		print(dim(kperk))
 		print(kperk)
 	}
 	
-	kperk<- as.list(apply(kperk,MARGIN=1,FUN=function(z){z[which(!z==0)]}))
+	kperk <- as.list(apply(kperk,MARGIN=1,FUN=function(z){z[which(!z==0)]}))
 	kperk <- kperk[1:kmax]  # Take only until kmax already here, since for i>kmax, kperk[[i]] could be problematic
 	# If dealing with non-Cox regression, omit intercept from kit names
 	for(i in 1:length(kperk)){
-		names(kperk[[i]])<-rownames(k)[kperk[[i]]]
+		names(kperk[[i]]) <- rownames(k)[kperk[[i]]]
 	}
 	
 	# Kit costs per each k-step
@@ -500,16 +524,20 @@ oscar <- function(
 		kperk = kperk[1:kmax], # Chosen kits per k-steps up to kmax
 		cperk = cperk[1:kmax], # Total kit costs per each k-step up to kmax
 		## Data slots
-		x=as.matrix(x),	# Data matrix X
-		y=as.matrix(y), # Response Y
-		k=as.matrix(k), # Kit matrix K
-		w=as.numeric(w),	# Vector of weights/costs for kits
+		#x=ifelse(storeX, as.matrix(x), as.matrix(NA_real_)), # Data matrix X
+		#y=ifelse(storeY, as.matrix(y), as.matrix(NA_real_)), # Response Y
+		x = as.matrix(x),
+		y = as.matrix(y),
+		k = as.matrix(k), # Kit matrix K
+		w = as.numeric(w),	# Vector of weights/costs for kits
 		## Additional parameters
-		family=as.character(family),	# Model family as a character string
-		metric=as.character(metric),	# Model goodness metric
-		start=control$start,	# Method for generating starting points
-		kmax=kmax,	# Max run k-step
+		family = as.character(family),	# Model family as a character string
+		metric = as.character(metric),	# Model goodness metric
+		start = control$start,	# Method for generating starting points
+		kmax = kmax,	# Max run k-step
 		solver = solver,# Solver used in optimization (DBDC or LMBM)
+		in_selection = as.integer(in_selection), # Used starting point selection method
+		percentage = percentage, # Percentage of starting points
 		call = Call	# Used function call
 	)
 
@@ -520,22 +548,24 @@ oscar <- function(
 	# Calculate/extract model goodness metric at each k
 	try({
 		# Cox regression
-		if(family=="cox"){
+		if(base::tolower(family) == "cox"){
 			# Use c-index as the goodness measure
 			obj@goodness <- unlist(lapply(1:kmax, FUN=function(z) { survival::coxph(Surv(time=y[,1], event=y[,2]) ~ x %*% t(bperk[z,,drop=FALSE]))$concordance["concordance"] }))
-		}else if(family %in% c("mse", "gaussian")){
+		}else if(base::tolower(family) %in% c("mse", "gaussian")){
 			# Use mean squared error as the goodness measure
 			obj@goodness <- unlist(lapply(1:kmax, FUN=function(z) { mean((y - (cbind(1, x) %*% t(bperk[z,,drop=FALSE])))^2) }))
-		}else if(family=="logistic"){
+		}else if(base::tolower(family) %in% "logistic"){
 			# Use correct classification percent as the goodness measure
 			# ROC-AUC
-			if(metric=="auc"){
-				# TODO
-				stop("ROC-AUC yet to be implemented.")
+			if(base::tolower(metric) %in% c("roc", "roc-auc", "auc")){
+				obj@goodness <- unlist(lapply(1:kmax, FUN=function(z){
+					pred <- cbind(1, x) %*% t(bperk[z,,drop=FALSE])
+					pROC::auc(pROC::roc(response = y, predictor = pred))
+				}))
 			# Accuracy
-			}else if(metric=="accuracy"){
-				#obj@goodness <- unlist(lapply(1:kmax, FUN=function(z) { sum(as.numeric(y == (predict.glm(z, type="response")>0.5)))/length(y) }))
-				stop("TODO for the generic case")
+			}else if(base::tolower(metric) == "accuracy"){
+				obj@goodness <- unlist(lapply(1:kmax, FUN=function(z) { sum(as.numeric(y == (predict.glm(z, type="response")>0.5)))/length(y) }))
+				warning("'Accuracy' metric in logistic regression yet to fully function for the generic case")
 			}else{
 				stop(paste("Invalid goodness-of-fit metric:", metric))
 			}

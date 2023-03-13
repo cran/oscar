@@ -78,49 +78,69 @@ oscar.cv <- function(
 		list(train = train, test = test)
 	}
 	# Generate cv-folds
-	cvsets <- cv(fit@x, fold = fold, seed = seed,strata=strata)
+	cvsets <- cv(fit@x, fold = fold, seed = seed, strata = strata)
 	cvsets
 	# Verbose
-	if(verb>=1) print(str(cvsets))
+	if(verb>=2) print(str(cvsets))
 	
-	# Fit family to use
-	#family <- fit@family
 	# K-steps
 	ks <- 1:nrow(fit@k)
 	# Loop over the CV folds, make a list of predictions and the real values
 	cvs <- lapply(1:fold, FUN=function(z){
-		if(verb>=1) print(paste("CV fold", z))
+		if(verb>=1) cat(paste0("\nCV fold ", z, " of ", fold, "\n"))
+		
+		# Remove redundant columns but give out a warning
+		x <- fit@x[cvsets$train[[z]],]
+		k <- fit@k
+		w <- fit@w
+		if(any(apply(x, MARGIN=2, FUN=\(q){ all(q==unique(q)[1]) }))){
+			omits <- which(apply(x, MARGIN=2, FUN=\(q){ all(q==unique(q)[1]) }))
+			x <- x[,-omits]
+			k <- k[-omits,-omits]
+			w <- w[-omits]
+			warning(paste("CV matrix 'x' contains redundant data columns in fold", z, " and these are removed in the cross-validation"))
+		}
 		# Constructing appropriate model object
 		if(fit@family == "cox"){
 			# Cox model is 2-column in y-response
-			fittmp <- oscar::oscar(x=fit@x[cvsets$train[[z]],], y=fit@y[cvsets$train[[z]],], family=fit@family, k=fit@k, w=fit@w, verb=verb, start=fit@start, ...)
+			y <- survival::Surv(fit@y[cvsets$train[[z]],])
 		}else if(fit@family %in% c("mse", "gaussian", "logistic")){
 			# All other models have a y-vector
-			fittmp <- oscar::oscar(x=fit@x[cvsets$train[[z]],], y=c(fit@y)[cvsets$train[[z]]], family=fit@family, k=fit@k, w=fit@w, verb=verb, start=fit@start, ...)
+			y <- c(fit@y)[cvsets$train[[z]]]
 		}else{
 			stop(paste("Incorrect family-parameter fit@family:", fit@family))
 		}
+		# Exhaustively use same set of fitting parameters in CV fits as in original fit
+		fittmp <- oscar::oscar(
+			x = x, 
+			y = y, 
+			family = fit@family, 
+			k = k, 
+			w = w, 
+			kmax = fit@kmax,
+			verb = verb, 
+			start = fit@start, 
+			#rho = fit@rho,
+			solver = fit@solver,
+			in_selection = fit@in_selection, 
+			percentage = fit@percentage, 
+			...
+		)
+		
 		if(verb>=1) print("CV fit, predicting...")
 		# Perform predictions over all k-value fits
 		# Model specificity in predictions (?)
 		pred <- lapply(1:fit@kmax, FUN=function(ki){
-			#if(verb>=2) print(f)
 			x <- fit@x[cvsets$test[[z]],,drop=FALSE]
-			#colnames(x) <- colnames(fit@x)
-			#x <- as.matrix(fit@x[cvsets$test[[z]],])
 			# MSE/Gaussian
 			if(fit@family %in% c("mse", "gaussian")){
 				oscar::predict(fit, type = "response", k = ki, newdata = x)
-				#as.vector(unlist(stats::predict.glm(f, type="response", newdata=x)))
-				
 			# Logistic	
 			}else if(fit@family %in% c("logistic")){
 				oscar::predict(fit, type = "response", k = ki, newdata = x)
-				#as.vector(unlist(stats::predict.glm(f, type="response", newdata=x)))
 			# Cox
 			}else if(fit@family %in% c("cox")){
 				oscar::predict(fit, type = "response", k = ki, newdata = x)
-				#as.vector(unlist(survival:::predict.coxph(f, type="risk", newdata=x)))
 			}
 		})
 		# True values; vectorization if not Cox ph model
@@ -131,6 +151,9 @@ oscar.cv <- function(
 		}else{
 			stop(paste("Incorrect family-parameter fit@family:", fit@family))
 		}
+		
+		if(verb>=1) print(paste("Finished fold", z))
+		
 		# Return predictions vs. real y-values
 		list(
 			# Predicted values
@@ -231,9 +254,17 @@ oscar.bs <- function(
 		samps <- sample(1:nrow(fit@x), replace=TRUE)
 		xtemp <- fit@x[samps,]
 		ytemp <- fit@y[samps,]
+		# Failsafe to not produce any rendundant columns
+		while(any(apply(xtemp, MARGIN=2, FUN=\(q){ all(q==unique(q)[1]) }))){
+			warning("Boostrapping produces a redundant variable, re-sampling...")
+			# Sampling with replacement from rows
+			samps <- sample(1:nrow(fit@x), replace=TRUE)
+			xtemp <- fit@x[samps,]
+			ytemp <- fit@y[samps,]
+		}
 		# Wrap expression inside try for catching errors
 		try({
-			ftemp <- oscar::oscar(x = xtemp, y = ytemp, k = fit@k, w = fit@w, family = fit@family, kmax = fit@kmax, print = verb, start = fit@start, verb = verb, ...)		
+			ftemp <- oscar::oscar(x = xtemp, y = ytemp, k = fit@k, w = fit@w, family = fit@family, kmax = fit@kmax, print = verb, start = fit@start, verb = verb, in_selection=fit@in_selection, percentage = fit@percentage,...)		
 		})
 		# Return successfully fitted model
 		if(!inherits(ftemp,"try-error")){
