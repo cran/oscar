@@ -37,7 +37,7 @@ knitr::include_graphics("images/fig2_targetfunc_cost.png")
 
 ## ----eval=FALSE, dpi=150, fig.width=7, fig.height=7, out.width="100%", fig.cap="5-fold cross-validation for optimally generalizable cardinality 'k'"----
 #  # Perform 5-fold cross-validation to find out optimal k
-#  cv <- oscar.cv(fit, fold=5, seed=123, solver=2)
+#  cv <- oscar.cv(fit, fold=5, seed=123)
 #  # Visualize model generalization performance as a function of k
 #  oscar.cv.visu(cv)
 
@@ -46,7 +46,7 @@ knitr::include_graphics("images/fig3_cv.png")
 
 ## ----eval=FALSE, dpi=150, fig.width=7, fig.height=7, out.width="100%", fig.cap="Selected variables over a set of bootstrap runs"----
 #  # Bootstrap original data 20 times (sampling with replacement and refitting)
-#  bs <- oscar.bs(fit, bootstrap=20, seed=234, solver=2)
+#  bs <- oscar.bs(fit, bootstrap=20, seed=234)
 #  # Visualize bootstrapped models
 #  oscar.bs.plot(fit=fit, bs=bs, nbins=20)
 
@@ -82,7 +82,7 @@ knitr::include_graphics("images/fig6_swiss_bs.png")
 
 ## ----eval=FALSE, dpi=150, fig.width=7, fig.height=7, out.width="100%", fig.cap="10-fold cross-validation for optimally generalizable cardinality 'k'"----
 #  # Perform 5-fold cross-validation to find out optimal k
-#  cv_swiss <- oscar.cv(fit_swiss, fold=10, seed=2, solver=2)
+#  cv_swiss <- oscar.cv(fit_swiss, fold=10, seed=2)
 #  # Visualize model generalization performance as a function of k
 #  oscar.cv.visu(cv_swiss)
 

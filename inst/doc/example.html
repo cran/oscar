@@ -12,7 +12,7 @@
 
 <meta name="author" content="Teemu Daniel Laajala" />
 
-<meta name="date" content="2023-03-28" />
+<meta name="date" content="2023-08-07" />
 
 <title>Example use of the OSCAR package</title>
 
@@ -340,7 +340,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Example use of the OSCAR package</h1>
 <h4 class="author">Teemu Daniel Laajala</h4>
-<h4 class="date">2023-03-28</h4>
+<h4 class="date">2023-08-07</h4>
 
 
 
@@ -456,7 +456,7 @@ Target function value as a function of k.
 <h3>Cross-validation and bootstrapping</h3>
 <p>Fit model object can be inspected based on visual diagnostics such as cross-validation and bootstrapping:</p>
 <div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true"></a><span class="co"># Perform 5-fold cross-validation to find out optimal k</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true"></a>cv &lt;-<span class="st"> </span><span class="kw">oscar.cv</span>(fit, <span class="dt">fold=</span><span class="dv">5</span>, <span class="dt">seed=</span><span class="dv">123</span>, <span class="dt">solver=</span><span class="dv">2</span>)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true"></a>cv &lt;-<span class="st"> </span><span class="kw">oscar.cv</span>(fit, <span class="dt">fold=</span><span class="dv">5</span>, <span class="dt">seed=</span><span class="dv">123</span>)</span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true"></a><span class="co"># Visualize model generalization performance as a function of k</span></span>
 <span id="cb18-4"><a href="#cb18-4" aria-hidden="true"></a><span class="kw">oscar.cv.visu</span>(cv)</span></code></pre></div>
 <div class="figure">
@@ -468,7 +468,7 @@ Target function value as a function of k.
 <p>It appears that k-values around 5 or above present a shoulder-point saturate the model, with no further coefficients contributing to the model’s generalization capability.</p>
 <p>Further, there is some uncertainty as to what order the coefficients should be non-zero, based on bootstrapping:</p>
 <div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true"></a><span class="co"># Bootstrap original data 20 times (sampling with replacement and refitting)</span></span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true"></a>bs &lt;-<span class="st"> </span><span class="kw">oscar.bs</span>(fit, <span class="dt">bootstrap=</span><span class="dv">20</span>, <span class="dt">seed=</span><span class="dv">234</span>, <span class="dt">solver=</span><span class="dv">2</span>)</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true"></a>bs &lt;-<span class="st"> </span><span class="kw">oscar.bs</span>(fit, <span class="dt">bootstrap=</span><span class="dv">20</span>, <span class="dt">seed=</span><span class="dv">234</span>)</span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true"></a><span class="co"># Visualize bootstrapped models</span></span>
 <span id="cb19-4"><a href="#cb19-4" aria-hidden="true"></a><span class="kw">oscar.bs.plot</span>(<span class="dt">fit=</span>fit, <span class="dt">bs=</span>bs, <span class="dt">nbins=</span><span class="dv">20</span>)</span></code></pre></div>
 <div class="figure">
@@ -533,7 +533,7 @@ Bootstrapping of Swiss fertility data (Gaussian/MSE)
 </p>
 </div>
 <div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true"></a><span class="co"># Perform 5-fold cross-validation to find out optimal k</span></span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true"></a>cv_swiss &lt;-<span class="st"> </span><span class="kw">oscar.cv</span>(fit_swiss, <span class="dt">fold=</span><span class="dv">10</span>, <span class="dt">seed=</span><span class="dv">2</span>, <span class="dt">solver=</span><span class="dv">2</span>)</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true"></a>cv_swiss &lt;-<span class="st"> </span><span class="kw">oscar.cv</span>(fit_swiss, <span class="dt">fold=</span><span class="dv">10</span>, <span class="dt">seed=</span><span class="dv">2</span>)</span>
 <span id="cb28-3"><a href="#cb28-3" aria-hidden="true"></a><span class="co"># Visualize model generalization performance as a function of k</span></span>
 <span id="cb28-4"><a href="#cb28-4" aria-hidden="true"></a><span class="kw">oscar.cv.visu</span>(cv_swiss)</span></code></pre></div>
 <div class="figure">
@@ -551,14 +551,14 @@ Bootstrapping of Swiss fertility data (Gaussian/MSE)
 <li><p>Halkola AS, Joki K, Mirtti T, M{\&quot;a}kel{\&quot;a} MM, Aittokallio T, Laajala TD (2023) OSCAR: Optimal subset cardinality regression using the L0-pseudonorm with applications to prognostic modelling of prostate cancer. PLoS Comput Biol 19(3): e1010333. <a href="https://doi.org/10.1371/journal.pcbi.1010333" class="uri">https://doi.org/10.1371/journal.pcbi.1010333</a></p></li>
 <li><p>Joki K, Bagirov AM, Karmitsa N, Makela MM, Taheri S. Double Bundle Method for finding Clarke Stationary Points in Nonsmooth DC Programming. SIAM Journal on Optimization. 2018;28(2):1892-1919. </p></li>
 <li><p>Haarala M, Miettinen K, Makela MM. New limited memory bundle method for large-scale nonsmooth optimization. Optimization Methods and Software. 2004;19(6):673-692. </p></li>
-<li><p>Laajala TD, Murtojarvi M, Virkki A, Aittokallio T. ePCR: an R-package for survival and time-to-event prediction in advanced prostate cancer, applied to real-world patient cohorts. Bioinformatics. 2018;34(22):3957-3959. </p></li>
+<li><p>Laajala TD, Murtoj{\&quot;a}rvi M, Virkki A, Aittokallio T. ePCR: an R-package for survival and time-to-event prediction in advanced prostate cancer, applied to real-world patient cohorts. Bioinformatics. 2018;34(22):3957-3959. </p></li>
 </ol>
 </div>
 <div id="session-info" class="section level1">
 <h1>Session info</h1>
 <div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true"></a><span class="kw">sessionInfo</span>()</span></code></pre></div>
-<pre><code>## R Under development (unstable) (2023-03-09 r83957 ucrt)
-## Platform: x86_64-w64-mingw32/x64 (64-bit)
+<pre><code>## R Under development (unstable) (2023-07-23 r84741 ucrt)
+## Platform: x86_64-w64-mingw32/x64
 ## Running under: Windows 10 x64 (build 19045)
 ## 
 ## Matrix products: default
@@ -576,16 +576,16 @@ Bootstrapping of Swiss fertility data (Gaussian/MSE)
 ## [1] stats     graphics  grDevices utils     datasets  methods   base     
 ## 
 ## other attached packages:
-## [1] oscar_1.1.4
+## [1] oscar_1.1.7
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] pROC_1.18.0     digest_0.6.31   R6_2.5.1        fastmap_1.1.1  
-##  [5] Matrix_1.5-3    xfun_0.37       lattice_0.20-45 splines_4.3.0  
-##  [9] cachem_1.0.7    knitr_1.42      htmltools_0.5.4 rmarkdown_2.20 
-## [13] cli_3.6.0       hamlet_0.9.6    grid_4.3.0      sass_0.4.5     
-## [17] jquerylib_0.1.4 compiler_4.3.0  highr_0.10      plyr_1.8.8     
-## [21] tools_4.3.0     evaluate_0.20   bslib_0.4.2     survival_3.5-3 
-## [25] Rcpp_1.0.10     yaml_2.3.7      rlang_1.0.6     jsonlite_1.8.4</code></pre>
+##  [1] pROC_1.18.4     digest_0.6.33   R6_2.5.1        fastmap_1.1.1  
+##  [5] Matrix_1.6-0    xfun_0.39       lattice_0.21-8  splines_4.4.0  
+##  [9] cachem_1.0.8    knitr_1.43      htmltools_0.5.5 rmarkdown_2.23 
+## [13] cli_3.6.1       hamlet_0.9.6    grid_4.4.0      sass_0.4.7     
+## [17] jquerylib_0.1.4 compiler_4.4.0  highr_0.10      plyr_1.8.8     
+## [21] tools_4.4.0     evaluate_0.21   bslib_0.5.0     survival_3.5-5 
+## [25] Rcpp_1.0.11     yaml_2.3.7      rlang_1.1.1     jsonlite_1.8.7</code></pre>
 </div>
 
 
