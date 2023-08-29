@@ -63,6 +63,7 @@ cost(fit, k=3) # Kit sum costs at various k cardinalities, here with cardinality
 ## ----eval=FALSE, dpi=150, fig.width=7, fig.height=7, out.width="100%", fig.cap="Model coefficients as a function of cardinality 'k'."----
 #  # Use example swiss-data for quickness
 #  data(swiss)
+#  set.seed(2)
 #  fit_swiss <- oscar(x=swiss[,-1], y=swiss[,1], family="mse", print=0, solver=2)
 #  
 #  # Plot model coefficients as a function of cardinality k
@@ -73,7 +74,7 @@ knitr::include_graphics("images/fig5_swiss_coef.png")
 
 ## ----eval=FALSE, dpi=150, fig.width=7, fig.height=7, out.width="100%", fig.cap="Bootstrapping of Swiss fertility data (Gaussian/MSE)"----
 #  # Bootstrap original data 50 times (sampling with replacement and refitting)
-#  bs_swiss <- oscar.bs(fit_swiss, bootstrap=50, seed=1, solver=2)
+#  bs_swiss <- oscar.bs(fit_swiss, bootstrap=50, seed=234)
 #  # Visualize trajectories of bootstrapped coefficients
 #  oscar.bs.plot(fit=fit_swiss, bs=bs_swiss, nbins=50)
 
@@ -82,7 +83,7 @@ knitr::include_graphics("images/fig6_swiss_bs.png")
 
 ## ----eval=FALSE, dpi=150, fig.width=7, fig.height=7, out.width="100%", fig.cap="10-fold cross-validation for optimally generalizable cardinality 'k'"----
 #  # Perform 5-fold cross-validation to find out optimal k
-#  cv_swiss <- oscar.cv(fit_swiss, fold=10, seed=2)
+#  cv_swiss <- oscar.cv(fit_swiss, fold=10, seed=345)
 #  # Visualize model generalization performance as a function of k
 #  oscar.cv.visu(cv_swiss)
 

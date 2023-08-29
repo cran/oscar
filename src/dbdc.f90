@@ -11,7 +11,7 @@
         !| |                       2) Mean square error model                                 | |
         !| |                       3) Logistic regression model                               | |
         !| |                                                                                  | |
-        !| |                       by Kaisa Joki (last modified  December  2022)              | |
+        !| |                       by Kaisa Joki, modified by Teemu Daniel Laajala            | |
         !| |                                                                                  | |
         !| |      Features :                                                                  | |
         !| |                                                                                  | |
@@ -17810,7 +17810,7 @@ END MODULE lmbm_mod
                
                REAL(KIND=c_double) :: tol_zero        ! The tolerance for value zero (i.e. if value is smaller than 'tol_zero' -> it is set to be zero
  
-               REAL(KIND=c_double) :: random_num      ! Random number  
+             !  REAL(KIND=c_double) :: random_num      ! Random number  
 
                INTEGER(KIND=c_int) :: n_starts        ! the number of generated starting points
           
@@ -17852,7 +17852,7 @@ END MODULE lmbm_mod
                
                INTEGER(KIND=c_int) :: nft_subp                      ! The number of features in SUBPROBLEM/ALTERED PROBLEM
 
-               INTEGER(KIND=c_int)  :: nkits_subp                   ! The indices of features in SUBPROBLEM/ALTERED PROBLEM 
+               INTEGER(KIND=c_int) :: nkits_subp                   ! The indices of features in SUBPROBLEM/ALTERED PROBLEM 
                
                LOGICAL :: kit_in_use            ! If .TRUE. kit is used in the solution
                LOGICAL :: run_stop              ! If .TRUE. run of this subroutine is stopped for selected k
@@ -17893,13 +17893,21 @@ END MODULE lmbm_mod
                                                  !                    accuracy.
                                                  !              -5  - Invalid input parameters.
                                                  !              -6  - Unspecified error.
-                                                 
+	
+                    ! RNG generation via C wrappers
+                    external getrngseed, putrngseed
+                    double precision unif1
+                    external unif1
  !** 
                     !--------------------------------------------        
                     !                INITIALIZATION
                     !--------------------------------------------
                     
                     ! **** GENERAL PARAMETERS FOR THE SUBROUTINE **** 
+
+                    IF (iprint <= 0) THEN
+                    	! iprint = 0
+                    END IF
                     
                     user_n = nft              ! The dimension of the original problem
                     iprint_DBDC = 0_c_int     ! The print is supressed 
@@ -18002,8 +18010,11 @@ END MODULE lmbm_mod
                              IF (start == 4) THEN ! A random starting point is generated
                                x_0 = 0.01_c_double
                                DO ii = 1, nk
-                                 CALL RANDOM_NUMBER(random_num)
-                                 mRand(ii) = random_num
+                                 ! CALL RANDOM_NUMBER(random_num)
+                                 CALL getrngseed()                                 
+                                 ! mRand(ii) = random_num
+                                 mRand(ii) = unif1()
+                                 CALL putrngseed()
                                  mRandInd(ii) = ii
                                END DO 
                                CALL heapsort_ind(mRand,mRandInd)                    
@@ -18544,7 +18555,7 @@ END MODULE lmbm_mod
                
                REAL(KIND=c_double) :: tol_zero        ! The tolerance for value zero (i.e. if value is smaller than 'tol_zero' -> it is set to be zero
  
-               REAL(KIND=c_double) :: random_num      ! Random number  
+             !  REAL(KIND=c_double) :: random_num      ! Random number  
 
                INTEGER(KIND=c_int) :: n_starts        ! the number of generated starting points
           
@@ -18627,6 +18638,11 @@ END MODULE lmbm_mod
                                                  !                    accuracy.
                                                  !              -5  - Invalid input parameters.
                                                  !              -6  - Unspecified error.
+
+                    ! RNG generation via C wrappers
+                    external getrngseed, putrngseed
+                    double precision unif1
+                    external unif1
                                                  
  !** 
                     !--------------------------------------------        
@@ -18634,6 +18650,10 @@ END MODULE lmbm_mod
                     !--------------------------------------------
                     
                     ! **** GENERAL PARAMETERS FOR THE SUBROUTINE **** 
+
+                    IF (iprint <= 0) THEN
+                    	! iprint = 0
+                    END IF
                     
                     user_n = nft+1              ! The dimension of the original MSE problem
                     iprint_DBDC = 0_c_int       ! The print is supressed 
@@ -18736,8 +18756,11 @@ END MODULE lmbm_mod
                              IF (start == 4) THEN ! A random starting point is generated
                                x_0 = 0.01_c_double
                                DO ii = 1, nk
-                                 CALL RANDOM_NUMBER(random_num)
-                                 mRand(ii) = random_num
+                                 ! CALL RANDOM_NUMBER(random_num)
+                                 CALL getrngseed()
+                                 ! mRand(ii) = random_num
+                                 mRand(ii) = unif1()
+                                 CALL putrngseed()
                                  mRandInd(ii) = ii
                                END DO 
                                CALL heapsort_ind(mRand,mRandInd)                    
@@ -19279,7 +19302,7 @@ END MODULE lmbm_mod
                
                REAL(KIND=c_double) :: tol_zero        ! The tolerance for value zero (i.e. if value is smaller than 'tol_zero' -> it is set to be zero
  
-               REAL(KIND=c_double) :: random_num      ! Random number  
+             !  REAL(KIND=c_double) :: random_num      ! Random number  
 
                INTEGER(KIND=c_int) :: n_starts        ! the number of generated starting points
           
@@ -19362,6 +19385,10 @@ END MODULE lmbm_mod
                                                  !                    accuracy.
                                                  !              -5  - Invalid input parameters.
                                                  !              -6  - Unspecified error.
+                    ! RNG generation via C wrappers
+                    external getrngseed, putrngseed
+                    double precision unif1
+                    external unif1
                                                  
  !** 
                     !--------------------------------------------        
@@ -19369,6 +19396,10 @@ END MODULE lmbm_mod
                     !--------------------------------------------
                     
                     ! **** GENERAL PARAMETERS FOR THE SUBROUTINE **** 
+                    
+                    IF (iprint <= 0) THEN
+                    	! iprint = 0
+                    END IF
                     
                     user_n = nft+1              ! The dimension of the original MSE problem
                     iprint_DBDC = 0_c_int       ! The print is supressed 
@@ -19471,8 +19502,11 @@ END MODULE lmbm_mod
                              IF (start == 4) THEN ! A random starting point is generated
                                x_0 = 0.01_c_double
                                DO ii = 1, nk
-                                 CALL RANDOM_NUMBER(random_num)
-                                 mRand(ii) = random_num
+                                 ! CALL RANDOM_NUMBER(random_num)
+                                 CALL getrngseed()
+                                 ! mRand(ii) = random_num
+                                 mRand(ii) = unif1() 
+                                 CALL putrngseed()
                                  mRandInd(ii) = ii
                                END DO 
                                CALL heapsort_ind(mRand,mRandInd)                    
@@ -19607,11 +19641,6 @@ END MODULE lmbm_mod
                         run_stop = .FALSE.          ! Initialization of 'run_stop' to .FALSE. since we cannot stop
                         num_rho = 0                 ! The selection of the first value of penalization parameter rho
                                             
-!                        IF (iprint >= 2) THEN
-!                           WRITE(*,*) '-------------------------------------' 
-!                           WRITE(*,*) 'New start point used.' 
-!                        END IF
-                      
                         DO WHILE(.NOT. run_stop)    ! The optimization begins for the selected starting point      
                       
                           IF (k > 1) THEN  ! Procedure with more than one kit (i.e. k>1)
@@ -19751,23 +19780,7 @@ END MODULE lmbm_mod
                           f1_current = f1(info,beta_solution,problem1,user_n) 
                           f2_current = f2(info,beta_solution,problem2,user_n)
         
-!                          IF (iprint > 2) THEN
-!                             WRITE(*,*) 'rho', rho, 'f',f1_current-f2_current, 'kits', kit_num   
-!                          END IF
-                        
-!                          IF (run_stop) THEN
-!                            IF ((iprint >= 2) .AND. (kit_num <= k)) THEN   
-!                              WRITE(*,*)
-!                              WRITE(*,*) 'f=',f1_current-f2_current, 'and kits', kit_num
-!                            END IF  
-!                            IF ((iprint >=2) .AND. (kit_num > k)) THEN                                      
-!                              WRITE(*,*)
-!                              WRITE(*,*) 'f=',f1_current-f2_current, 'and kits', kit_num, 'should be equal to', k 
-!                            END IF
-!                          END IF
-                        
                         END DO
-                           
                    
                    END DO
   

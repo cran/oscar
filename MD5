@@ -1,5 +1,6 @@
-2f20db517e96bdbe185348f0436932d2 *DESCRIPTION
+6e91601ef7204c19fdcb606cb4292778 *DESCRIPTION
 366dbb8b0cb3025b2e875c1179b962c4 *NAMESPACE
+14683a1af243661479f5b7d7a6184ed5 *NEWS.md
 88df34381dc31f1036bbec9272b79c80 *R/fitS4.R
 baf70d9748202ed7af0ec609cb010e01 *R/funcsS4.R
 7b7e310337083db21e6089731a8d4291 *R/helpers.R
@@ -10,9 +11,9 @@ e12cf2ff984d72b759f50e94b4eba802 *R/visu.R
 2ed962529fb797ce17ed9b01d20d9301 *build/vignette.rds
 3a30ceb0e4f4a5ef04d7584bde027c2d *data/ex.RData
 1a69487d0d9e339b9c7a31bb52fcf152 *inst/CITATION
-5f6755d49020366ad93cbc79802f4dc0 *inst/doc/example.R
-dc0bd12566122c71a1e24ea5038b668b *inst/doc/example.Rmd
-6f543915b84f8a8204032cb67feab4e8 *inst/doc/example.html
+f8cde5d9a3d51163ea5dfaad75eca762 *inst/doc/example.R
+d5b4e318fa908c287a4abfbf3740e5ca *inst/doc/example.Rmd
+deb1fdc23717e58bd2b859e818861361 *inst/doc/example.html
 8a024c67bd0b86b84f727f4ecdb3f708 *man/cost.Rd
 d96530b1b52e4d50d80c6cc83b05175a *man/ex.Rd
 7d2f43a865a48b5ba440fa7da89aa0c3 *man/feat.Rd
@@ -38,11 +39,11 @@ b6f451b9976960baf8b0522eb09e9854 *man/oscar.pareto.Rd
 d17cb3b9be1dc0c30da9253581f87a9e *man/oscar.sparsify.Rd
 76d52c2d877f9d845bd990e0a7af9959 *man/oscar.visu.Rd
 0bdf16cb7a37badd1cc21d97cd6263a0 *src/Makevars
-f9d24ed4142e6f3dceede59210a10e1b *src/dbdc.f90
-17f77638cebf25058f542b0be789ca94 *src/oscarc.c
+1cc635c8343a036660ff4000ce29708c *src/dbdc.f90
+240c5625c77bd4c8909620336ca04788 *src/oscarc.c
 2dd3befdaa057602c436a2bfdb1847eb *src/plqdf1.f
-dc0bd12566122c71a1e24ea5038b668b *vignettes/example.Rmd
-55eef01586e7d789d91fd142256d783a *vignettes/example_workspace.RData
+d5b4e318fa908c287a4abfbf3740e5ca *vignettes/example.Rmd
+024c91c77a94cc22cd7bdf446db194bc *vignettes/example_workspace.RData
 12817a5599eb80a1e42759b217b0d94f *vignettes/images/fig1_pareto.png
 498125d83e83e96a60f54859df039578 *vignettes/images/fig2_targetfunc_cost.png
 67dde2b88fe03acbee6f7736829682c4 *vignettes/images/fig3_cv.png
