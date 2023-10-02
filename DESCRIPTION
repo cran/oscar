@@ -2,8 +2,8 @@ Package: oscar
 Type: Package
 Title: Optimal Subset Cardinality Regression (OSCAR) Models Using the
         L0-Pseudonorm
-Version: 1.2.0
-Date: 2023-08-29
+Version: 1.2.1
+Date: 2023-10-02
 Authors@R: c(
     person(given=c("Teemu", "Daniel"), family="Laajala", role=c("aut", "cre"), email="teelaa@utu.fi", comment = c(ORCID = "0000-0002-7016-7354")),
     person(given="Kaisa", family="Joki", role=c("aut"), email="kjjoki@utu.fi"),
@@ -36,11 +36,11 @@ Suggests: ePCR, glmnet, knitr, rmarkdown
 VignetteBuilder: knitr
 Encoding: UTF-8
 RoxygenNote: 7.2.3
-Packaged: 2023-08-28 23:55:57 UTC; teemu
+Packaged: 2023-10-02 00:04:47 UTC; teemu
 Author: Teemu Daniel Laajala [aut, cre]
     (<https://orcid.org/0000-0002-7016-7354>),
   Kaisa Joki [aut],
   Anni Halkola [aut]
 Maintainer: Teemu Daniel Laajala <teelaa@utu.fi>
 Repository: CRAN
-Date/Publication: 2023-08-29 02:10:02 UTC
+Date/Publication: 2023-10-02 13:40:08 UTC
